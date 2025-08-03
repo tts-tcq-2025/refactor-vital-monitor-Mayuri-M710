@@ -17,9 +17,13 @@ bool isTemperatureOk(float temperature) {
     return temperature >= 95 && temperature <= 102;
 }
 
+bool ageInRange(int age, const PulseRateRange& range) {
+    return age >= range.minAge && age <= range.maxAge;
+}
+
 const PulseRateRange* findPulseRangeForAge(int age) {
     for (const auto& range : pulseRateRanges) {
-        if (age >= range.minAge && age <= range.maxAge) {
+        if (ageInRange(age, range)) {
             return &range;
         }
     }
@@ -53,20 +57,22 @@ VitalChecks checkAllVitals(float temperature, float pulseRate, float spo2, int a
     return checks;
 }
 
-int vitalsOk(float temperature, float pulseRate, float spo2, int age) {
-    VitalChecks checks = checkAllVitals(temperature, pulseRate, spo2, age);
-    
-    if (!checks.temperature) {
-        printAlert("Temperature is critical!");
-        return 0;
-    }
-    if (!checks.pulseRate) {
-        printAlert("Pulse Rate is out of range!");
-        return 0;
-    }
-    if (!checks.spo2) {
-        printAlert("Oxygen Saturation out of range!");
+int handleVitalAlert(bool isOk, const char* message) {
+    if (!isOk) {
+        printAlert(message);
         return 0;
     }
     return 1;
+}
+
+int vitalsOk(float temperature, float pulseRate, float spo2, int age) {
+    VitalChecks checks = checkAllVitals(temperature, pulseRate, spo2, age);
+    
+    int result = handleVitalAlert(checks.temperature, "Temperature is critical!");
+    if (result == 0) return 0;
+    
+    result = handleVitalAlert(checks.pulseRate, "Pulse Rate is out of range!");
+    if (result == 0) return 0;
+    
+    return handleVitalAlert(checks.spo2, "Oxygen Saturation out of range!");
 }
