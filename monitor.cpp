@@ -3,6 +3,7 @@
 #include <thread>
 #include <chrono>
 #include <iostream>
+#include <algorithm>
 using std::cout, std::flush, std::this_thread::sleep_for, std::chrono::seconds;
 
 static const PulseRateRange pulseRateRanges[] = {
@@ -22,12 +23,13 @@ bool ageInRange(int age, const PulseRateRange& range) {
 }
 
 const PulseRateRange* findPulseRangeForAge(int age) {
-    for (const auto& range : pulseRateRanges) {
-        if (ageInRange(age, range)) {
-            return &range;
-        }
-    }
-    return nullptr;
+    const auto* end = pulseRateRanges +
+                      sizeof(pulseRateRanges) / sizeof(pulseRateRanges[0]);
+    const auto* result = std::find_if(pulseRateRanges, end,
+                                      [age](const PulseRateRange& range) {
+                                          return ageInRange(age, range);
+                                      });
+    return result != end ? result : nullptr;
 }
 
 bool isPulseRateOk(float pulseRate, int age) {
