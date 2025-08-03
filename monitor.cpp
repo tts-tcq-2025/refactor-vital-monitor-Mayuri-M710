@@ -5,13 +5,6 @@
 #include <iostream>
 using std::cout, std::flush, std::this_thread::sleep_for, std::chrono::seconds;
 
-struct PulseRateRange {
-    int minAge;
-    int maxAge;
-    float minPulse;
-    float maxPulse;
-};
-
 static const PulseRateRange pulseRateRanges[] = {
     {0, 0, 100, 160},    // newborn
     {1, 5, 80, 140},     // infant/toddler
@@ -24,13 +17,18 @@ bool isTemperatureOk(float temperature) {
     return temperature >= 95 && temperature <= 102;
 }
 
-bool isPulseRateOk(float pulseRate, int age) {
+const PulseRateRange* findPulseRangeForAge(int age) {
     for (const auto& range : pulseRateRanges) {
         if (age >= range.minAge && age <= range.maxAge) {
-            return pulseRate >= range.minPulse && pulseRate <= range.maxPulse;
+            return &range;
         }
     }
-    return false; // age not found
+    return nullptr;
+}
+
+bool isPulseRateOk(float pulseRate, int age) {
+    const PulseRateRange* range = findPulseRangeForAge(age);
+    return range && pulseRate >= range->minPulse && pulseRate <= range->maxPulse;
 }
 
 bool isSpO2Ok(float spo2) {
@@ -47,16 +45,26 @@ void printAlert(const char* message) {
     }
 }
 
+VitalChecks checkAllVitals(float temperature, float pulseRate, float spo2, int age) {
+    VitalChecks checks;
+    checks.temperature = isTemperatureOk(temperature);
+    checks.pulseRate = isPulseRateOk(pulseRate, age);
+    checks.spo2 = isSpO2Ok(spo2);
+    return checks;
+}
+
 int vitalsOk(float temperature, float pulseRate, float spo2, int age) {
-    if (!isTemperatureOk(temperature)) {
+    VitalChecks checks = checkAllVitals(temperature, pulseRate, spo2, age);
+    
+    if (!checks.temperature) {
         printAlert("Temperature is critical!");
         return 0;
     }
-    if (!isPulseRateOk(pulseRate, age)) {
+    if (!checks.pulseRate) {
         printAlert("Pulse Rate is out of range!");
         return 0;
     }
-    if (!isSpO2Ok(spo2)) {
+    if (!checks.spo2) {
         printAlert("Oxygen Saturation out of range!");
         return 0;
     }

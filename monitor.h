@@ -3,8 +3,14 @@
 struct PulseRateRange {
     int minAge;
     int maxAge;
-    int minPulse;
-    int maxPulse;
+    float minPulse;
+    float maxPulse;
+};
+
+struct VitalChecks {
+    bool temperature;
+    bool pulseRate;
+    bool spo2;
 };
 
 // Returns 0 if any vital is out of range, 1 otherwise
@@ -17,3 +23,5 @@ bool isSpO2Ok(float spo2);
 
 // Alert function for I/O
 void printAlert(const char* message);
+VitalChecks checkAllVitals(float temperature, float pulseRate, float spo2, int age);
+const PulseRateRange* findPulseRangeForAge(int age);

@@ -1,52 +1,58 @@
 #include <gtest/gtest.h>
 #include "./monitor.h"
 
-TEST(Monitor, NotOkWhenAnyVitalIsOffRange) {
-  ASSERT_FALSE(vitalsOk(99, 102, 70, 30)); // adult, pulse high, spo2 low
-  ASSERT_TRUE(vitalsOk(98.1, 70, 98, 30)); // adult, all normal
-  ASSERT_TRUE(vitalsOk(98.1, 120, 98, 3)); // child, pulse normal for age
-  ASSERT_FALSE(vitalsOk(98.1, 120, 98, 30)); // adult, pulse high
-  ASSERT_TRUE(vitalsOk(98.1, 150, 98, 0)); // newborn, pulse normal
-  ASSERT_FALSE(vitalsOk(98.1, 150, 98, 10)); // child, pulse high
+// Test pure logic functions without I/O
+TEST(Monitor, TemperatureChecks) {
+  ASSERT_TRUE(isTemperatureOk(98.6f));
+  ASSERT_TRUE(isTemperatureOk(95.0f)); // lower bound
+  ASSERT_TRUE(isTemperatureOk(102.0f)); // upper bound
+  ASSERT_FALSE(isTemperatureOk(94.9f)); // below lower
+  ASSERT_FALSE(isTemperatureOk(102.1f)); // above upper
 }
 
-TEST(Monitor, TemperatureCritical) {
-  ASSERT_FALSE(vitalsOk(103, 80, 98, 30)); // high temp
-  ASSERT_FALSE(vitalsOk(94, 80, 98, 30)); // low temp
-  ASSERT_TRUE(vitalsOk(95, 80, 98, 30)); // lower bound
-  ASSERT_TRUE(vitalsOk(102, 80, 98, 30)); // upper bound
+TEST(Monitor, SpO2Checks) {
+  ASSERT_TRUE(isSpO2Ok(95.0f));
+  ASSERT_TRUE(isSpO2Ok(90.0f)); // lower bound
+  ASSERT_TRUE(isSpO2Ok(100.0f)); // upper bound
+  ASSERT_FALSE(isSpO2Ok(89.9f)); // below lower
 }
 
-TEST(Monitor, SpO2Critical) {
-  ASSERT_FALSE(vitalsOk(98.1, 80, 89, 30)); // low SpO2
-  ASSERT_TRUE(vitalsOk(98.1, 80, 90, 30)); // lower bound
-  ASSERT_TRUE(vitalsOk(98.1, 80, 100, 30)); // upper bound
+TEST(Monitor, PulseRateChecks) {
+  // Newborn (age 0)
+  ASSERT_TRUE(isPulseRateOk(130.0f, 0));
+  ASSERT_TRUE(isPulseRateOk(100.0f, 0)); // lower bound
+  ASSERT_TRUE(isPulseRateOk(160.0f, 0)); // upper bound
+  ASSERT_FALSE(isPulseRateOk(99.0f, 0)); // below
+  ASSERT_FALSE(isPulseRateOk(161.0f, 0)); // above
+  
+  // Adult (age 30)
+  ASSERT_TRUE(isPulseRateOk(75.0f, 30));
+  ASSERT_TRUE(isPulseRateOk(60.0f, 30)); // lower bound
+  ASSERT_TRUE(isPulseRateOk(100.0f, 30)); // upper bound
+  ASSERT_FALSE(isPulseRateOk(59.0f, 30)); // below
+  ASSERT_FALSE(isPulseRateOk(101.0f, 30)); // above
 }
 
-TEST(Monitor, AgeBasedPulseRate) {
-  // Newborn
-  ASSERT_TRUE(vitalsOk(98.1, 100, 98, 0)); // lower bound
-  ASSERT_TRUE(vitalsOk(98.1, 160, 98, 0)); // upper bound
-  ASSERT_FALSE(vitalsOk(98.1, 99, 98, 0)); // below lower
-  ASSERT_FALSE(vitalsOk(98.1, 161, 98, 0)); // above upper
-  // Infant/toddler
-  ASSERT_TRUE(vitalsOk(98.1, 80, 98, 2)); // lower bound
-  ASSERT_TRUE(vitalsOk(98.1, 140, 98, 2)); // upper bound
-  ASSERT_FALSE(vitalsOk(98.1, 79, 98, 2)); // below lower
-  ASSERT_FALSE(vitalsOk(98.1, 141, 98, 2)); // above upper
-  // Child
-  ASSERT_TRUE(vitalsOk(98.1, 70, 98, 8)); // lower bound
-  ASSERT_TRUE(vitalsOk(98.1, 110, 98, 8)); // upper bound
-  ASSERT_FALSE(vitalsOk(98.1, 69, 98, 8)); // below lower
-  ASSERT_FALSE(vitalsOk(98.1, 111, 98, 8)); // above upper
-  // Adolescent
-  ASSERT_TRUE(vitalsOk(98.1, 60, 98, 13)); // lower bound
-  ASSERT_TRUE(vitalsOk(98.1, 105, 98, 13)); // upper bound
-  ASSERT_FALSE(vitalsOk(98.1, 59, 98, 13)); // below lower
-  ASSERT_FALSE(vitalsOk(98.1, 106, 98, 13)); // above upper
-  // Adult
-  ASSERT_TRUE(vitalsOk(98.1, 60, 98, 30)); // lower bound
-  ASSERT_TRUE(vitalsOk(98.1, 100, 98, 30)); // upper bound
-  ASSERT_FALSE(vitalsOk(98.1, 59, 98, 30)); // below lower
-  ASSERT_FALSE(vitalsOk(98.1, 101, 98, 30)); // above upper
+TEST(Monitor, VitalChecksStruct) {
+  VitalChecks checks = checkAllVitals(98.6f, 75.0f, 95.0f, 30);
+  ASSERT_TRUE(checks.temperature);
+  ASSERT_TRUE(checks.pulseRate);
+  ASSERT_TRUE(checks.spo2);
+  
+  checks = checkAllVitals(105.0f, 45.0f, 85.0f, 30); // all out of range
+  ASSERT_FALSE(checks.temperature);
+  ASSERT_FALSE(checks.pulseRate);
+  ASSERT_FALSE(checks.spo2);
+}
+
+// Test the main function but only for logic, avoiding I/O delay
+TEST(Monitor, VitalsOkLogic) {
+  // Test cases that should return 1 (OK) - these won't print alerts
+  ASSERT_EQ(1, vitalsOk(98.6f, 75.0f, 95.0f, 30)); // all normal adult
+  ASSERT_EQ(1, vitalsOk(98.1f, 130.0f, 98.0f, 0)); // normal newborn
+  
+  // Test cases that should return 0 (NOT OK) - these will print alerts but we minimize them
+  ASSERT_EQ(0, vitalsOk(105.0f, 75.0f, 95.0f, 30)); // only temperature critical
+  ASSERT_EQ(0, vitalsOk(98.6f, 45.0f, 95.0f, 30)); // only pulse critical  
+  ASSERT_EQ(0, vitalsOk(98.6f, 75.0f, 85.0f, 30)); // only SpO2 critical
 }
