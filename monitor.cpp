@@ -5,59 +5,46 @@
 #include <iostream>
 using std::cout, std::flush, std::this_thread::sleep_for, std::chrono::seconds;
 
-void sendData(const char* message) {
-  cout << message << '\n';
-  for (int i = 0; i < 6; i++) {
-    cout << "\r* " << flush;
-    sleep_for(seconds(1));
-    cout << "\r *" << flush;
-    sleep_for(seconds(1));
-  }
+// Pure functions
+bool isTemperatureOk(float temperature) {
+    return temperature >= 95 && temperature <= 102;
 }
 
-int vitalsOk(float temperature, float pulseRate, float spo2) {
-  if (temperature > 102 || temperature < 95) {
-    sendData("Temperature is critical!");
-    return 0;
-  }
-  if (pulseRate < 60 || pulseRate > 100) {
-    sendData("Pulse Rate is out of range!");
-    return 0;
-  }
-  if (spo2 < 90) {
-    sendData("Oxygen Saturation out of range!");
-    return 0;
-  }
-  return 1;
+// Age-based pulse rate ranges (adults, children, infants)
+bool isPulseRateOk(float pulseRate, int age) {
+    if (age < 1) return pulseRate >= 100 && pulseRate <= 160; // newborn
+    if (age < 6) return pulseRate >= 80 && pulseRate <= 140;  // infant/toddler
+    if (age < 11) return pulseRate >= 70 && pulseRate <= 110; // child
+    if (age < 15) return pulseRate >= 60 && pulseRate <= 105; // adolescent
+    return pulseRate >= 60 && pulseRate <= 100; // adult
 }
-// int vitalsOk(float temperature, float pulseRate, float spo2) {
-//   if (temperature > 102 || temperature < 95) {
-//     cout << "Temperature is critical!\n";
-//     for (int i = 0; i < 6; i++) {
-//       cout << "\r* " << flush;
-//       sleep_for(seconds(1));
-//       cout << "\r *" << flush;
-//       sleep_for(seconds(1));
-//     }
-//     return 0;
-//   } else if (pulseRate < 60 || pulseRate > 100) {
-//     cout << "Pulse Rate is out of range!\n";
-//     for (int i = 0; i < 6; i++) {
-//       cout << "\r* " << flush;
-//       sleep_for(seconds(1));
-//       cout << "\r *" << flush;
-//       sleep_for(seconds(1));
-//     }
-//     return 0;
-//   } else if (spo2 < 90) {
-//     cout << "Oxygen Saturation out of range!\n";
-//     for (int i = 0; i < 6; i++) {
-//       cout << "\r* " << flush;
-//       sleep_for(seconds(1));
-//       cout << "\r *" << flush;
-//       sleep_for(seconds(1));
-//     }
-//     return 0;
-//   }
-//   return 1;
-// }
+
+bool isSpO2Ok(float spo2) {
+    return spo2 >= 90;
+}
+
+void printAlert(const char* message) {
+    cout << message << "\n";
+    for (int i = 0; i < 6; i++) {
+        cout << "\r* " << flush;
+        sleep_for(seconds(1));
+        cout << "\r *" << flush;
+        sleep_for(seconds(1));
+    }
+}
+
+int vitalsOk(float temperature, float pulseRate, float spo2, int age) {
+    if (!isTemperatureOk(temperature)) {
+        printAlert("Temperature is critical!");
+        return 0;
+    }
+    if (!isPulseRateOk(pulseRate, age)) {
+        printAlert("Pulse Rate is out of range!");
+        return 0;
+    }
+    if (!isSpO2Ok(spo2)) {
+        printAlert("Oxygen Saturation out of range!");
+        return 0;
+    }
+    return 1;
+}
