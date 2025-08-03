@@ -23,7 +23,8 @@ bool isSpO2Ok(float spo2);
 
 // Alert function for I/O
 void printAlert(const char* message);
-VitalChecks checkAllVitals(float temperature, float pulseRate, float spo2, int age);
+VitalChecks checkAllVitals(float temperature, float pulseRate, float spo2,
+                           int age);
 const PulseRateRange* findPulseRangeForAge(int age);
 bool ageInRange(int age, const PulseRateRange& range);
 int handleVitalAlert(bool isOk, const char* message);
