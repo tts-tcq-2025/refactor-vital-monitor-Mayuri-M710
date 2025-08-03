@@ -1,5 +1,12 @@
 #pragma once
 
+struct PulseRateRange {
+    int minAge;
+    int maxAge;
+    int minPulse;
+    int maxPulse;
+};
+
 // Returns 0 if any vital is out of range, 1 otherwise
 int vitalsOk(float temperature, float pulseRate, float spo2, int age);
 

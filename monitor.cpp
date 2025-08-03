@@ -5,18 +5,32 @@
 #include <iostream>
 using std::cout, std::flush, std::this_thread::sleep_for, std::chrono::seconds;
 
-// Pure functions
+struct PulseRateRange {
+    int minAge;
+    int maxAge;
+    float minPulse;
+    float maxPulse;
+};
+
+static const PulseRateRange pulseRateRanges[] = {
+    {0, 0, 100, 160},    // newborn
+    {1, 5, 80, 140},     // infant/toddler
+    {6, 10, 70, 110},    // child
+    {11, 14, 60, 105},   // adolescent
+    {15, 200, 60, 100}   // adult (assuming max age 200)
+};
+
 bool isTemperatureOk(float temperature) {
     return temperature >= 95 && temperature <= 102;
 }
 
-// Age-based pulse rate ranges (adults, children, infants)
 bool isPulseRateOk(float pulseRate, int age) {
-    if (age < 1) return pulseRate >= 100 && pulseRate <= 160; // newborn
-    if (age < 6) return pulseRate >= 80 && pulseRate <= 140;  // infant/toddler
-    if (age < 11) return pulseRate >= 70 && pulseRate <= 110; // child
-    if (age < 15) return pulseRate >= 60 && pulseRate <= 105; // adolescent
-    return pulseRate >= 60 && pulseRate <= 100; // adult
+    for (const auto& range : pulseRateRanges) {
+        if (age >= range.minAge && age <= range.maxAge) {
+            return pulseRate >= range.minPulse && pulseRate <= range.maxPulse;
+        }
+    }
+    return false; // age not found
 }
 
 bool isSpO2Ok(float spo2) {
