@@ -1,30 +1,18 @@
 #pragma once
 
-struct PulseRateRange {
-    int minAge;
-    int maxAge;
-    float minPulse;
-    float maxPulse;
-};
+// Main interface for vital signs monitoring system
+// This header includes all necessary components
 
-struct VitalChecks {
-    bool temperature;
-    bool pulseRate;
-    bool spo2;
-};
+#include "./vital_types.h"
+#include "./temperature_checker.h"
+#include "./pulse_checker.h"
+#include "./spo2_checker.h"
+#include "./alert_system.h"
 
-// Returns 0 if any vital is out of range, 1 otherwise
+// Main vital signs monitoring coordination functions
+
+// Checks all vitals and returns a struct with individual results
+VitalChecks checkAllVitals(float temperature, float pulseRate, float spo2, int age);
+
+// Main function: returns 0 if any vital is out of range, 1 otherwise
 int vitalsOk(float temperature, float pulseRate, float spo2, int age);
-
-// Pure function to check each vital
-bool isTemperatureOk(float temperature);
-bool isPulseRateOk(float pulseRate, int age);
-bool isSpO2Ok(float spo2);
-
-// Alert function for I/O
-void printAlert(const char* message);
-VitalChecks checkAllVitals(float temperature, float pulseRate, float spo2,
-                           int age);
-const PulseRateRange* findPulseRangeForAge(int age);
-bool ageInRange(int age, const PulseRateRange& range);
-int handleVitalAlert(bool isOk, const char* message);
