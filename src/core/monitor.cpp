@@ -1,4 +1,4 @@
-#include "./monitor.h"
+#include "monitor.h"
 
 VitalChecks checkAllVitals(float temperature, float pulseRate, float spo2,
                            int age) {

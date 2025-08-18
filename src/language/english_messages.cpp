@@ -1,0 +1,50 @@
+#include "english_messages.h"
+#include <cstring>
+
+const char* getEnglishTemperatureMessage(const char* condition) {
+    if (!condition) return nullptr;
+    
+    if (strcmp(condition, "approaching_hypothermia") == 0) {
+        return "Warning: Approaching hypothermia";
+    }
+    if (strcmp(condition, "approaching_hyperthermia") == 0) {
+        return "Warning: Approaching hyperthermia";
+    }
+    if (strcmp(condition, "critical_hypothermia") == 0) {
+        return "Temperature critical: Hypothermia";
+    }
+    if (strcmp(condition, "critical_hyperthermia") == 0) {
+        return "Temperature critical: Hyperthermia";
+    }
+    return nullptr;
+}
+
+const char* getEnglishPulseMessage(const char* condition) {
+    if (!condition) return nullptr;
+    
+    if (strcmp(condition, "pulse_low") == 0) {
+        return "Pulse critical: Too low";
+    }
+    if (strcmp(condition, "pulse_high") == 0) {
+        return "Pulse critical: Too high";
+    }
+    if (strcmp(condition, "pulse_approaching_low") == 0) {
+        return "Warning: Pulse approaching low limit";
+    }
+    if (strcmp(condition, "pulse_approaching_high") == 0) {
+        return "Warning: Pulse approaching high limit";
+    }
+    return nullptr;
+}
+
+const char* getEnglishSpO2Message(const char* condition) {
+    if (!condition) return nullptr;
+    
+    if (strcmp(condition, "spo2_critical") == 0) {
+        return "SpO2 critical: Severe hypoxemia";
+    }
+    if (strcmp(condition, "spo2_warning") == 0) {
+        return "Warning: SpO2 approaching low limit";
+    }
+    return nullptr;
+}

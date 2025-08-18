@@ -14,3 +14,9 @@ struct VitalChecks {
     bool pulseRate;
     bool spo2;
 };
+
+enum class OverallStatus {
+    ALL_NORMAL,
+    HAS_WARNINGS,
+    HAS_CRITICAL
+};

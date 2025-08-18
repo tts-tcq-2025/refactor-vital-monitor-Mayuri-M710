@@ -1,4 +1,4 @@
-#include "./pulse_checker.h"
+#include "pulse_checker.h"
 #include <algorithm>
 
 static const PulseRateRange pulseRateRanges[] = {
@@ -27,4 +27,20 @@ bool isPulseRateOk(float pulseRate, int age) {
     const PulseRateRange* range = findPulseRangeForAge(age);
     return range && pulseRate >= range->minPulse &&
            pulseRate <= range->maxPulse;
+}
+
+VitalStatus getPulseStatus(float pulseRate, int age) {
+    const PulseRateRange* range = findPulseRangeForAge(age);
+    if (!range) return VitalStatus::CRITICAL_LOW;
+    
+    float tolerance = range->maxPulse * 0.015f; // 1.5% tolerance
+    VitalRange pulseRange = {
+        0.0f,
+        range->minPulse,
+        range->minPulse + tolerance,
+        range->maxPulse - tolerance,
+        range->maxPulse,
+        300.0f
+    };
+    return checkVitalStatus(pulseRate, pulseRange);
 }
