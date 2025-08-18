@@ -32,8 +32,8 @@ bool isPulseRateOk(float pulseRate, int age) {
 VitalStatus getPulseStatus(float pulseRate, int age) {
     const PulseRateRange* range = findPulseRangeForAge(age);
     if (!range) return VitalStatus::CRITICAL_LOW;
-    
-    float tolerance = range->maxPulse * 0.015f; // 1.5% tolerance
+
+    float tolerance = range->maxPulse * 0.015f;  // 1.5% tolerance
     VitalRange pulseRange = {
         0.0f,
         range->minPulse,

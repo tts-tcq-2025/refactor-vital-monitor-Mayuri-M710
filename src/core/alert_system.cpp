@@ -27,7 +27,7 @@ bool isWarningStatus(VitalStatus status) {
     return status == VitalStatus::WARNING_LOW || status == VitalStatus::WARNING_HIGH;
 }
 
-int processVitalStatus(VitalStatus status, const char* criticalMsg, 
+int processVitalStatus(VitalStatus status, const char* criticalMsg,
                       const char* warningMsg, OutputFunction output) {
     if (isCriticalStatus(status) && output && criticalMsg) {
         output(criticalMsg);
@@ -39,7 +39,7 @@ int processVitalStatus(VitalStatus status, const char* criticalMsg,
     return 1;
 }
 
-int handleVitalWithOutput(VitalStatus status, const char* criticalMsg, 
+int handleVitalWithOutput(VitalStatus status, const char* criticalMsg,
                          const char* warningMsg, OutputFunction output) {
     return processVitalStatus(status, criticalMsg, warningMsg, output);
 }

@@ -22,7 +22,7 @@ OverallStatus determineOverallStatus(VitalStatus temp, VitalStatus pulse, VitalS
     return OverallStatus::ALL_NORMAL;
 }
 
-EnhancedVitalChecks checkAllVitalsEnhanced(float temperature, float pulseRate, 
+EnhancedVitalChecks checkAllVitalsEnhanced(float temperature, float pulseRate,
                                           float spo2, int age) {
     EnhancedVitalChecks checks;
     checks.temperature = getTemperatureStatus(temperature);
@@ -35,16 +35,16 @@ EnhancedVitalChecks checkAllVitalsEnhanced(float temperature, float pulseRate,
 int vitalsOkWithOutput(float temperature, float pulseRate, float spo2, int age,
                       OutputFunction output) {
     EnhancedVitalChecks checks = checkAllVitalsEnhanced(temperature, pulseRate, spo2, age);
-    
+
     int result = handleVitalWithOutput(checks.temperature,
                                       getTemperatureMessage(checks.temperature),
                                       getTemperatureMessage(checks.temperature), output);
     if (result == 0) return 0;
-    
+
     result = handleVitalWithOutput(checks.pulseRate, getPulseMessage(checks.pulseRate),
                                   getPulseMessage(checks.pulseRate), output);
     if (result == 0) return 0;
-    
+
     return handleVitalWithOutput(checks.spo2, getSpO2Message(checks.spo2),
                                 getSpO2Message(checks.spo2), output);
 }

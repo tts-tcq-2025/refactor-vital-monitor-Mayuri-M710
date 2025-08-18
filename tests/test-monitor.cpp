@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
+#include <string>
 #include "monitor.h"
 #include "language_support.h"
-#include <string>
 
 // Test pure logic functions without I/O
 TEST(Monitor, TemperatureChecks) {
@@ -102,12 +102,12 @@ TEST(Monitor, EdgeCases) {
 // Essential Extension 2 tests for language support
 TEST(Monitor, LanguageSwitching) {
   // Test language variable works
-  currentLanguage = 0; // English
+  currentLanguage = 0;  // English
   ASSERT_EQ(currentLanguage, 0);
-  
-  currentLanguage = 1; // German
+
+  currentLanguage = 1;  // German
   ASSERT_EQ(currentLanguage, 1);
-  
+
   // Test basic German message exists
   const char* msg = getLocalizedTemperatureMessage("approaching_hypothermia");
   ASSERT_TRUE(msg != nullptr);

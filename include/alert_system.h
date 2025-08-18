@@ -11,11 +11,11 @@ void printAlert(const char* message);
 void printWarning(const char* message);
 
 // Handles vital alert logic with dependency injection
-int handleVitalWithOutput(VitalStatus status, const char* criticalMsg, 
+int handleVitalWithOutput(VitalStatus status, const char* criticalMsg,
                          const char* warningMsg, OutputFunction output);
 
 // Helper functions
-int processVitalStatus(VitalStatus status, const char* criticalMsg, 
+int processVitalStatus(VitalStatus status, const char* criticalMsg,
                       const char* warningMsg, OutputFunction output);
 bool isCriticalStatus(VitalStatus status);
 bool isWarningStatus(VitalStatus status);
