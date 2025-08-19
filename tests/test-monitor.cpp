@@ -27,6 +27,22 @@ TEST(EnhancedMonitor, VitalsOkEnhancedLogic) {
   // SpO2 critical
   ASSERT_EQ(0, vitalsOkEnhanced(98.6f, 75.0f, 85.0f, 30));
 }
+
+// Essential Extension 2 tests for language support
+TEST(Monitor, LanguageSwitching) {
+  // Test language variable works
+  currentLanguage = 0;  // English
+  ASSERT_EQ(currentLanguage, 0);
+
+  currentLanguage = 1;  // German
+  ASSERT_EQ(currentLanguage, 1);
+
+  // Test basic German message exists
+  const char* msg = getLocalizedTemperatureMessage("approaching_hypothermia");
+  ASSERT_TRUE(msg != nullptr);
+  ASSERT_TRUE(std::string(msg).find("Warnung") != std::string::npos);
+}
+
 // Test edge cases and boundary conditions
 TEST(Monitor, EdgeCases) {
   // Test boundary values for temperature
@@ -46,22 +62,6 @@ TEST(Monitor, EdgeCases) {
   ASSERT_TRUE(isSpO2Ok(90.0f));   // exact threshold
   ASSERT_FALSE(isSpO2Ok(89.99f));  // just below threshold
 }
-
-// Essential Extension 2 tests for language support
-TEST(Monitor, LanguageSwitching) {
-  // Test language variable works
-  currentLanguage = 0;  // English
-  ASSERT_EQ(currentLanguage, 0);
-
-  currentLanguage = 1;  // German
-  ASSERT_EQ(currentLanguage, 1);
-
-  // Test basic German message exists
-  const char* msg = getLocalizedTemperatureMessage("approaching_hypothermia");
-  ASSERT_TRUE(msg != nullptr);
-  ASSERT_TRUE(std::string(msg).find("Warnung") != std::string::npos);
-}
-
 // Test pure logic functions without I/O
 // TEST(Monitor, TemperatureChecks) {
 //   ASSERT_TRUE(isTemperatureOk(98.6f));
