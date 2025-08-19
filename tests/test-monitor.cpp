@@ -15,6 +15,18 @@ TEST(Monitor, VitalsOkLogic) {
   ASSERT_EQ(0, vitalsOk(98.6f, 75.0f, 85.0f, 30));  // only SpO2 critical
 }
 
+TEST(EnhancedMonitor, VitalsOkEnhancedLogic) {
+  // All normal
+  ASSERT_EQ(1, vitalsOkEnhanced(98.6f, 75.0f, 95.0f, 30));
+  // Temperature warning
+  ASSERT_EQ(1, vitalsOkEnhanced(96.6f, 75.0f, 95.0f, 30)); // Approaching hypothermia
+  // Temperature critical
+  ASSERT_EQ(0, vitalsOkEnhanced(94.0f, 75.0f, 95.0f, 30));
+  // Pulse warning
+  ASSERT_EQ(1, vitalsOkEnhanced(98.6f, 61.0f, 95.0f, 30)); // Approaching low pulse
+  // SpO2 critical
+  ASSERT_EQ(0, vitalsOkEnhanced(98.6f, 75.0f, 85.0f, 30));
+}
 // Test edge cases and boundary conditions
 TEST(Monitor, EdgeCases) {
   // Test boundary values for temperature
