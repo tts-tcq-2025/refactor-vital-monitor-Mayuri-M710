@@ -1,4 +1,5 @@
 #pragma once
+#include "vital_types.h"
 
 // Vital signs ranges and threshold definitions
 // Single responsibility: Define vital sign thresholds
@@ -42,3 +43,7 @@ const VitalRange SPO2_RANGE = {
 
 // Function to check vital status against range
 VitalStatus checkVitalStatus(float value, const VitalRange& range);
+
+// Pulse rate ranges by age
+const PulseRateRange* getPulseRanges();
+int getPulseRangeCount();
